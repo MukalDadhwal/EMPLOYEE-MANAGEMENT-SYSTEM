@@ -1,0 +1,7 @@
+id 	name           gender  department salary   city          account  number 
+
+14401 Jaydeep Singh  M      Finance    60000      New Delhi    5700134
+14402 Amrita Kaur    F      HR         100000     Pune         7001025
+14403 Puskar Jain    M      Admin      90000      Pune         5600128
+14404 Chetan Mishra  M      security   30000      Bangalore    4009810
+ 
