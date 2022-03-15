@@ -33,6 +33,7 @@ import time
 # CHECKING CONNECTION
 try:
     db = connector.connect(host='localhost', user='root', passwd='ROOT', database='employee_management')
+    db.close()
 except:
     db = connector.connect(host="localhost", user="root", passwd="ROOT")
     cursor = db.cursor()
@@ -46,6 +47,7 @@ except:
     cursor = db.cursor()
     cursor.execute(createTableQuery)
     db.commit()
+    cursor.close()
     db.close()
 
 mydb = connector.connect(host='localhost', user='root', passwd='ROOT', database='employee_management')
@@ -74,17 +76,13 @@ def mainLoop():
         elif operation == 2:
             getDetails()
         elif operation == 3:
-            pass
-            # update_salary()
+            updateSalary()
         elif operation == 4:
-            pass
-            # retrieve_list()
+            getEmployeeList()
         elif operation == 5:
-            pass
-            # delete_employee()
+            deleteEmployee()
         elif operation == 6:
-            pass
-            # generate_payslip()
+            generatePayslip()
         elif operation == 7:
             pass
             # get_salary()
@@ -97,11 +95,11 @@ def mainLoop():
         response = input('Do you want to continue:(Y/N)')
 
         if response.lower() != 'y':
+            mycursor.close()
+            mydb.close()
+            print('Thanks! Have a nice day.')
             break
-    else:
-        cursor.close()
-        mydb.close()
-        print('Thanks! Have a nice day.')
+        
 
 
 def registerEmployee():
@@ -139,7 +137,7 @@ def registerEmployee():
         mycursor.execute(query)
         mydb.commit()
 
-        print('/n')
+        print('\n')
         print('Employee Added Successfully!')
     except Error as error:
         print('Something went wrong there!')
@@ -152,11 +150,61 @@ def getDetails():
     try:
         query = "select * from employee where emp_id='%s'" % employeeId
         mycursor.execute(query)
-    except Error as error:
+    except Error as _:
         print('Something went wrong there!')
         print('Please try again...')
-    employeeTuple = mycursor.fetchall() # LIST(<TUPLE>)
+    employeeTuple = mycursor.fetchall()[0] # LIST(<TUPLE>)
+    print('Employee details ...')
     
-    print(employeeTuple)
+    print('\n')
 
+    print('%11s'%'employee id', '%17s'%'name', '%9s'%'gender', '%15s'%'department', '%9s'%'salary', '%13s'%'city', '%11s'%'account no')
+
+    print('%11s'%str(employeeTuple[0]), '%17s'%employeeTuple[1], '%9s'%employeeTuple[2], '%15s'%employeeTuple[3], '%9s'%str(employeeTuple[4]), '%13s'%employeeTuple[5], '%11s'%str(employeeTuple[6]))
+
+def updateSalary():
+    employeeId = input('Enter the employee id: ')
+    increment = input('Enter the amount to increment: ')
+
+    print('\n')
+
+    try:
+        query = "UPDATE employee SET salary = salary + '%s' WHERE emp_id = '%s'" % (increment, employeeId)
+        mycursor.execute(query)
+        mydb.commit()
+        print('Salary updated successfully!')
+    except Error as _:
+        print('Something went wrong there!')
+        print('Please try again...')
+        mydb.rollback()
+
+def getEmployeeList():
+    print('EMPLOYEE LIST...')
+    print('\n')
+
+    print('%11s'%'employee id', '%17s'%'name', '%9s'%'gender', '%15s'%'department', '%9s'%'salary', '%13s'%'city', '%11s'%'account no')
+    try:
+        query = "SELECT * FROM employee"
+        mycursor.execute(query)
+        employeeList = mycursor.fetchall() # List(<tuple>)
+        for row in employeeList:
+            print('%11s'%str(row[0]), '%17s'%row[1], '%9s'%row[2], '%15s'%row[3], '%9s'%str(row[4]), '%13s'%row[5], '%11s'%str(row[6]))
+    except Error as _:
+        print('Something went wrong there!')
+        print('Please try again...')
+
+def deleteEmployee():
+    employeeId = input('Enter the employee id: ')
+    print('\n')
+    try:
+        query = "DELETE FROM employee WHERE emp_id='%s'" % employeeId
+        mycursor.execute(query)
+        mydb.commit()
+        print('Employee removed successfully!')
+    except Error as _:
+        print('Something went wrong there!')
+        print('Please try again...')
+        mydb.rollback()
+def generatePayslip():
+    pass
 mainLoop()
